@@ -27,6 +27,24 @@ const SignupScreen = () => {
     }
 
     const handleValidation = () => {
+        for (const [key, value] of Object.entries(input)) {
+            if (value === '') {
+                showMessage({
+                    message: `Please enter a ${key}`,
+                    type: "danger",
+                });
+                break
+            }
+        }
+
+        if (input.password != input.confirmPassword) {
+            showMessage({
+                message: 'Password not match',
+                type: 'danger'
+            })
+        }
+
+        console.log('Login Successful');
 
     }
 
@@ -84,13 +102,7 @@ const SignupScreen = () => {
                                 </TouchableOpacity>
                             </View>
                             {/* TODO: SIGN UP */}
-                            <Button onPress={() => {
-                                /* HERE IS WHERE WE'RE GOING TO SHOW OUR FIRST MESSAGE */
-                                showMessage({
-                                    message: "Simple message",
-                                    type: "danger",
-                                });
-                            }} title='Sign Up' titleSize={20} titleWeight={'500'} buttonColor='#f4ca1a' />
+                            <Button onPress={() => handleValidation()} title='Sign Up' titleSize={20} titleWeight={'500'} buttonColor='#f4ca1a' />
                         </View>
                         <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
                             Or
