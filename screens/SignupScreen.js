@@ -26,26 +26,26 @@ const SignupScreen = () => {
         }));
     }
 
+    const errorMessage = (messageText, messageType) => {
+        showMessage({
+            message: messageText,
+            type: messageType
+        })
+    }
     const handleValidation = () => {
-        for (const [key, value] of Object.entries(input)) {
-            if (value === '') {
-                showMessage({
-                    message: `Please enter a ${key}`,
-                    type: "danger",
-                });
-                break
-            }
+        if (!input.username) {
+            errorMessage('Please enter a username', 'danger')
+        } else if (!input.email) {
+            errorMessage('Please enter a email', 'danger')
+        } else if (!input.password) {
+            errorMessage('Please enter a password', 'danger')
+        } else if (!input.confirmPassword) {
+            errorMessage('Please enter confirm password', 'danger')
+        } else if (input.password != input.confirmPassword) {
+            errorMessage('Password not match', 'danger')
+        } else {
+            console.log('Login Successful');
         }
-
-        if (input.password != input.confirmPassword) {
-            showMessage({
-                message: 'Password not match',
-                type: 'danger'
-            })
-        }
-
-        console.log('Login Successful');
-
     }
 
     const navigation = useNavigation();
