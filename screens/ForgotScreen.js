@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import Button from '../components/Button';
 
 const ForgotScreen = () => {
     const navigation = useNavigation();
@@ -35,6 +36,7 @@ const ForgotScreen = () => {
                                     Confirm
                                 </Text>
                             </TouchableOpacity>
+                            <Button title='Button' iconName='google' iconSize={25} iconColor='white' />
                         </View>
                     </View>
                 </ScrollView>

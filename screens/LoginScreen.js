@@ -1,5 +1,5 @@
 import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { COLORS } from '../constants/colors'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -7,6 +7,10 @@ import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 
 const LoginScreen = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [hidePassword, setHidePassword] = useState(true);
+
     const navigation = useNavigation();
     return (
         <KeyboardAvoidingView
@@ -18,28 +22,32 @@ const LoginScreen = () => {
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                         <FontAwesome5 name={'arrow-left'} solid size={20} />
                     </TouchableOpacity>
-                    {/* <Text style={{ fontSize: 50, color: '#FFF' }}>Hi!</Text> */}
-                    <Image source={require("../assets/images/signup.png")} style={{ width: 200, height: 200, alignSelf: 'center' }} />
+                    <View style={{ marginLeft: 20, marginTop: 40 }}>
+                        <Text style={{ fontSize: 45, color: '#fff' }}>Login Form</Text>
+                        <Text style={{ fontSize: 20, color: '#fff', }}>Sign in to continue</Text>
+                    </View>
                 </View>
             </SafeAreaView>
             <KeyboardAvoidingWrapper>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <View style={{ flex: 1, backgroundColor: '#FFF', borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
-                        <Text style={{ fontSize: 40, color: '#000', textAlign: 'center', marginTop: 20 }}>Welcome!</Text>
-                        <Text style={{ fontSize: 20, color: '#000', textAlign: 'center' }}>Sign in to continue</Text>
+                    <View style={{ flex: 1, backgroundColor: '#FFF', height: 600, borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
                         <View style={styles.formContainer}>
                             <TextInput style={styles.input}
                                 placeholder='Username / Email'
                             />
                             <View style={{ flexDirection: 'row' }}>
                                 <TextInput style={styles.input}
-                                    secureTextEntry
+                                    secureTextEntry={hidePassword}
                                     placeholder='Password'
                                 />
-                                <FontAwesome5 name='eye' size={20} style={{ position: 'absolute', alignSelf: 'center', right: 20 }} />
+                                {
+                                    hidePassword ?
+                                        <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name='eye' style={styles.passwordShow} size={25} />
+                                        : <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name='eye-slash' style={styles.passwordShow} size={25} />
+                                }
                             </View>
                             <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
-                                <Text style={{ alignSelf: 'flex-end', marginVertical: 10, fontSize: 15 }}>Forgot Password?</Text>
+                                <Text style={{ alignSelf: 'flex-end', marginVertical: 5, fontSize: 15 }}>Forgot Password?</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.signupButton}>
                                 <Text style={{ fontSize: 20 }}>
@@ -52,8 +60,16 @@ const LoginScreen = () => {
                         </Text>
                         <TouchableOpacity style={styles.googleButton}>
                             <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
-                            <Text>Login with Google</Text>
+                            <Text style={{ fontSize: 20 }}>Login with Google</Text>
                         </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', gap: 5, alignSelf: 'center', marginVertical: 30 }}>
+                            <Text style={{ fontSize: 15 }}>
+                                Don't have an account?
+                            </Text>
+                            <TouchableOpacity>
+                                <Text style={{ fontSize: 15 }}>Sign Up</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingWrapper>
@@ -75,7 +91,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     formContainer: {
-        paddingTop: 30,
+        paddingTop: 70,
         paddingHorizontal: 30,
         gap: 10,
         alignItems: 'center',
@@ -86,13 +102,18 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         backgroundColor: '#eff1f3'
     },
+    passwordShow: {
+        position: 'absolute',
+        alignSelf: 'center',
+        right: 20,
+    },
     signupButton: {
         width: '100%',
         padding: 20,
         backgroundColor: '#f4ca1a',
         borderRadius: 15,
         alignItems: 'center',
-        marginTop: 20
+        marginTop: 10
     },
     googleButton: {
         flexDirection: 'row',
@@ -103,6 +124,5 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         padding: 15,
         borderRadius: 15,
-        marginBottom: 40
     }
 })

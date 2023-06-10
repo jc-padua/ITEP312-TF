@@ -5,50 +5,77 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import Button from '../components/Button';
+import FlashMessage, { showMessage, hideMessage } from 'react-native-flash-message';
 
 const SignupScreen = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [hidePassword, setHidePassword] = useState(true);
+    const [hideConfirmPassword, setConfirmHidePassword] = useState(true);
 
+    const [input, setInput] = useState({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    })
+
+    const onChangeValue = (textValue, inputName) => {
+        setInput((prevInput) => ({
+            ...prevInput,
+            [inputName]: textValue,
+        }));
+    }
+
+    const handleValidation = () => {
+
+    }
 
     const navigation = useNavigation();
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1, backgroundColor: COLORS.bg }}
-        >
+        <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
             <SafeAreaView style={{ flex: 1 }}>
                 <View>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                         <FontAwesome5 name={'arrow-left'} solid size={20} />
                     </TouchableOpacity>
-                    {/* <Text style={{ fontSize: 50, color: '#FFF' }}>Hi!</Text> */}
-                    <Image source={require("../assets/images/signup.png")} style={{ width: 200, height: 200, alignSelf: 'center' }} />
+                    <View style={{ marginLeft: 20, marginTop: 40 }}>
+                        <Text style={{ fontSize: 45, color: '#fff' }}>Sign Up Form</Text>
+                        <Text style={{ fontSize: 20, color: '#fff' }}>Create a new account</Text>
+                    </View>
                 </View>
             </SafeAreaView>
             <KeyboardAvoidingWrapper>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={{ flex: 1, backgroundColor: '#FFF', borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
-                        <Text style={{ fontSize: 30, color: '#000', textAlign: 'center', marginTop: 20 }}>Create a new account</Text>
+                        <FlashMessage position="top" style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }} />
                         <View style={styles.formContainer}>
                             <TextInput style={styles.input}
                                 placeholder='Username'
+                                value={input.username}
+                                onChangeText={text => onChangeValue(text, 'username')}
                             />
                             <TextInput style={styles.input}
                                 placeholder='Email'
+                                value={input.email}
+                                onChangeText={text => onChangeValue(text, 'email')}
                             />
                             <View style={{ flexDirection: 'row' }}>
                                 <TextInput style={styles.input}
                                     secureTextEntry={hidePassword}
                                     placeholder='Password'
+                                    value={input.password}
+                                    onChangeText={text => onChangeValue(text, 'password')}
                                 />
-                                {
-                                    hidePassword ?
-                                        <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name='eye' style={styles.passwordInput} size={25} />
-                                        : <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name='eye-slash' style={styles.passwordInput} size={25} />
-                                }
+                                <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name={hidePassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <TextInput style={styles.input}
+                                    secureTextEntry={hideConfirmPassword}
+                                    placeholder='Confirm Password'
+                                    value={input.confirmPassword}
+                                    onChangeText={text => onChangeValue(text, 'confirmPassword')}
+                                />
+                                <FontAwesome5 onPress={() => setConfirmHidePassword(!hideConfirmPassword)} name={hideConfirmPassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
                             </View>
                             <View style={{ flexDirection: 'row', gap: 5 }}>
                                 <Text>Already have an account?</Text>
@@ -56,23 +83,26 @@ const SignupScreen = () => {
                                     <Text style={{ color: 'blue' }}>Login here</Text>
                                 </TouchableOpacity>
                             </View>
-                            <TouchableOpacity style={styles.signupButton}>
-                                <Text style={{ fontSize: 20 }}>
-                                    Sign Up
-                                </Text>
-                            </TouchableOpacity>
+                            {/* TODO: SIGN UP */}
+                            <Button onPress={() => {
+                                /* HERE IS WHERE WE'RE GOING TO SHOW OUR FIRST MESSAGE */
+                                showMessage({
+                                    message: "Simple message",
+                                    type: "danger",
+                                });
+                            }} title='Sign Up' titleSize={20} titleWeight={'500'} buttonColor='#f4ca1a' />
                         </View>
                         <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
                             Or
                         </Text>
                         <TouchableOpacity style={styles.googleButton}>
                             <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
-                            <Text>Sign Up with Google</Text>
+                            <Text style={{ fontWeight: '500', fontSize: 15 }}>Sign Up with Google</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingWrapper>
-        </KeyboardAvoidingView >
+        </View >
     )
 }
 
@@ -92,7 +122,7 @@ const styles = StyleSheet.create({
     formContainer: {
         paddingTop: 30,
         paddingHorizontal: 30,
-        gap: 10,
+        gap: 15,
         alignItems: 'center',
     },
     input: {
@@ -101,7 +131,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         backgroundColor: '#eff1f3'
     },
-    passwordInput: {
+    passwordShow: {
         position: 'absolute',
         alignSelf: 'center',
         right: 20
