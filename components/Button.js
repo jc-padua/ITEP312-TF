@@ -16,7 +16,7 @@ const Button = ({
 }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.buttonContainer, { backgroundColor: buttonColor }]}>
-            <FontAwesome5Icon name={iconName} size={iconSize} color={iconColor} />
+            {/* <FontAwesome5Icon name={iconName} size={iconSize} color={iconColor} /> */}
             <Text style={{ color: titleColor, fontSize: titleSize, fontWeight: titleWeight }}>{title}</Text>
         </TouchableOpacity>
     )
@@ -27,6 +27,7 @@ export default Button
 const styles = StyleSheet.create({
     buttonContainer: {
         padding: 20,
+        marginTop: 10,
         width: '100%',
         alignSelf: 'center',
         borderRadius: 15,

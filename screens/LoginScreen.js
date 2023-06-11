@@ -5,74 +5,151 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import Button from '../components/Button';
+import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FlashMessage, { showMessage } from 'react-native-flash-message';
+import Loader from '../components/Loader';
 
-const LoginScreen = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+const LoginScreen = ({ navigation }) => {
     const [hidePassword, setHidePassword] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    const navigation = useNavigation();
+    const [input, setInput] = useState({
+        email: "",
+        password: ""
+    })
+
+    const onChangeValue = (textValue, inputName) => {
+        setInput((prevInput) => ({
+            ...prevInput,
+            [inputName]: textValue,
+        }));
+    }
+
+    const errorMessage = (messageText, messageType) => {
+        showMessage({
+            message: messageText,
+            type: messageType
+        })
+    }
+
+    const handleValidation = () => {
+        if (!input.email) {
+            errorMessage('Please enter a email address', 'danger')
+        } else if (!input.email.match(/\S+@\S+\.\S+/)) {
+            errorMessage('Please enter valid email address', 'danger')
+        } else if (!input.password) {
+            errorMessage('Please enter a password', 'danger')
+        } else {
+            login()
+        }
+    }
+
+    const login = async () => {
+        setLoading(true);
+        try {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+
+            const userData = await AsyncStorage.getItem('userData');
+            if (userData) {
+                const parsedUserData = JSON.parse(userData);
+                if (input.email === parsedUserData.email && input.password === parsedUserData.password) {
+                    navigation.navigate('Home')
+                } else {
+                    Dialog.show({
+                        type: ALERT_TYPE.DANGER,
+                        title: 'Error',
+                        textBody: 'Incorrect Email / Password',
+                        button: 'close',
+                        autoClose: 500,
+                    });
+                }
+            } else {
+                Dialog.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Error',
+                    textBody: 'Account doesn\'t exist!',
+                    button: 'close',
+                    autoClose: 500,
+                });
+            }
+        } catch (error) {
+            Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: error.toString(),
+                button: 'close',
+                autoClose: 500,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    // const navigation = useNavigation();
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1, backgroundColor: COLORS.bg }}
         >
-            <SafeAreaView style={{ flex: 1 }}>
-                <View>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <FontAwesome5 name={'arrow-left'} solid size={20} />
-                    </TouchableOpacity>
-                    <View style={{ marginLeft: 20, marginTop: 40 }}>
-                        <Text style={{ fontSize: 45, color: '#fff' }}>Login Form</Text>
-                        <Text style={{ fontSize: 20, color: '#fff', }}>Sign in to continue</Text>
-                    </View>
-                </View>
-            </SafeAreaView>
-            <KeyboardAvoidingWrapper>
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <View style={{ flex: 1, backgroundColor: '#FFF', height: 600, borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
-                        <View style={styles.formContainer}>
-                            <TextInput style={styles.input}
-                                placeholder='Username / Email'
-                            />
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextInput style={styles.input}
-                                    secureTextEntry={hidePassword}
-                                    placeholder='Password'
-                                />
-                                {
-                                    hidePassword ?
-                                        <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name='eye' style={styles.passwordShow} size={25} />
-                                        : <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name='eye-slash' style={styles.passwordShow} size={25} />
-                                }
-                            </View>
-                            <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
-                                <Text style={{ alignSelf: 'flex-end', marginVertical: 5, fontSize: 15 }}>Forgot Password?</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.signupButton}>
-                                <Text style={{ fontSize: 20 }}>
-                                    Login
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
-                            Or
-                        </Text>
-                        <TouchableOpacity style={styles.googleButton}>
-                            <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
-                            <Text style={{ fontSize: 20 }}>Login with Google</Text>
+            <AlertNotificationRoot>
+                <Loader visible={loading} />
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View>
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                            <FontAwesome5 name={'arrow-left'} solid size={20} />
                         </TouchableOpacity>
-                        <View style={{ flexDirection: 'row', gap: 5, alignSelf: 'center', marginVertical: 30 }}>
-                            <Text style={{ fontSize: 15 }}>
-                                Don't have an account?
-                            </Text>
-                            <TouchableOpacity>
-                                <Text style={{ fontSize: 15 }}>Sign Up</Text>
-                            </TouchableOpacity>
+                        <View style={{ marginLeft: 20, marginTop: 40 }}>
+                            <Text style={{ fontSize: 45, color: '#fff' }}>Login Form</Text>
+                            <Text style={{ fontSize: 20, color: '#fff', }}>Sign in to continue</Text>
                         </View>
                     </View>
-                </ScrollView>
-            </KeyboardAvoidingWrapper>
+                </SafeAreaView>
+                <KeyboardAvoidingWrapper>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                        <View style={{ flex: 1, backgroundColor: '#FFF', height: 600, borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
+                            <FlashMessage position="top" style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }} />
+                            <View style={styles.formContainer}>
+                                <TextInput style={styles.input}
+                                    placeholder='Email'
+                                    onChangeText={(text) => {
+                                        onChangeValue(text, 'email')
+                                    }}
+                                />
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TextInput style={styles.input}
+                                        secureTextEntry={hidePassword}
+                                        placeholder='Password'
+                                        onChangeText={(text) => onChangeValue(text, 'password')}
+                                    />
+                                    <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name={hidePassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
+                                </View>
+                                <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
+                                    <Text style={{ alignSelf: 'flex-end', marginVertical: 5, fontSize: 15 }}>Forgot Password?</Text>
+                                </TouchableOpacity>
+                                <Button onPress={() => handleValidation()} title={'Login'} buttonColor='#f4ca1a' titleSize={20} titleWeight={'500'} />
+                            </View>
+                            <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
+                                Or
+                            </Text>
+                            <TouchableOpacity style={styles.googleButton}>
+                                <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
+                                <Text style={{ fontSize: 20 }}>Login with Google</Text>
+                            </TouchableOpacity>
+                            <View style={{ flexDirection: 'row', gap: 5, alignSelf: 'center', marginVertical: 30 }}>
+                                <Text style={{ fontSize: 15 }}>
+                                    Don't have an account?
+                                </Text>
+                                <TouchableOpacity>
+                                    <Text style={{ fontSize: 15 }}>Sign Up</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingWrapper>
+            </AlertNotificationRoot>
         </KeyboardAvoidingView >
     )
 }

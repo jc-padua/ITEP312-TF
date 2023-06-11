@@ -1,9 +1,8 @@
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
 import { COLORS } from '../constants/colors'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import Button from '../components/Button';
 import FlashMessage, { showMessage, hideMessage } from 'react-native-flash-message';
@@ -38,32 +37,34 @@ const SignupScreen = ({ navigation }) => {
         })
     }
 
-    const register = () => {
+    const register = async () => {
         setLoading(true);
-        setTimeout(() => {
-            try {
-                setLoading(false);
-                AsyncStorage.setItem('userData', JSON.stringify(input))
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    title: 'Success',
-                    textBody: 'User Successfully Created!',
-                    button: 'close',
-                    autoClose: 500,
-                    onHide: () => navigation.navigate('Login')
-                })
-            } catch (error) {
-                Dialog.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: error,
-                    button: 'close',
-                    autoClose: 500
-                })
-            }
-        }, 3000)
+        try {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    }
+            await AsyncStorage.setItem('userData', JSON.stringify(input));
+
+            Dialog.show({
+                type: ALERT_TYPE.SUCCESS,
+                title: 'Success',
+                textBody: 'User Successfully Created!',
+                button: 'close',
+                autoClose: 500,
+                onHide: () => navigation.navigate('Login'),
+            });
+        } catch (error) {
+            Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: error.toString(),
+                button: 'close',
+                autoClose: 500,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const handleValidation = () => {
         if (!input.username) {
