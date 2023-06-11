@@ -1,5 +1,5 @@
 import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { COLORS } from '../constants/colors'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -7,10 +7,15 @@ import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import Button from '../components/Button';
 import FlashMessage, { showMessage, hideMessage } from 'react-native-flash-message';
+import Loader from '../components/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
 
-const SignupScreen = () => {
+const SignupScreen = ({ navigation }) => {
     const [hidePassword, setHidePassword] = useState(true);
     const [hideConfirmPassword, setConfirmHidePassword] = useState(true);
+    const [loading, setLoading] = useState(false);
+    // const navigation = useNavigation();
 
     const [input, setInput] = useState({
         username: "",
@@ -32,88 +37,123 @@ const SignupScreen = () => {
             type: messageType
         })
     }
+
+    const register = () => {
+        setLoading(true);
+        setTimeout(() => {
+            try {
+                setLoading(false);
+                AsyncStorage.setItem('userData', JSON.stringify(input))
+                Dialog.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: 'Success',
+                    textBody: 'User Successfully Created!',
+                    button: 'close',
+                    autoClose: 500,
+                    onHide: () => navigation.navigate('Login')
+                })
+            } catch (error) {
+                Dialog.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Error',
+                    textBody: error,
+                    button: 'close',
+                    autoClose: 500
+                })
+            }
+        }, 3000)
+
+    }
+
     const handleValidation = () => {
         if (!input.username) {
             errorMessage('Please enter a username', 'danger')
         } else if (!input.email) {
             errorMessage('Please enter a email', 'danger')
+        } else if (!input.email.match(/\S+@\S+\.\S+/)) {
+            errorMessage('Please enter valid email address', 'danger')
         } else if (!input.password) {
             errorMessage('Please enter a password', 'danger')
+        } else if (input.password.length < 8) {
+            errorMessage('Minimum Password length must be 8', 'danger');
         } else if (!input.confirmPassword) {
             errorMessage('Please enter confirm password', 'danger')
         } else if (input.password != input.confirmPassword) {
             errorMessage('Password not match', 'danger')
         } else {
-            console.log('Login Successful');
+            register()
         }
     }
 
-    const navigation = useNavigation();
+
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
-            <SafeAreaView style={{ flex: 1 }}>
-                <View>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <FontAwesome5 name={'arrow-left'} solid size={20} />
-                    </TouchableOpacity>
-                    <View style={{ marginLeft: 20, marginTop: 40 }}>
-                        <Text style={{ fontSize: 45, color: '#fff' }}>Sign Up Form</Text>
-                        <Text style={{ fontSize: 20, color: '#fff' }}>Create a new account</Text>
-                    </View>
-                </View>
-            </SafeAreaView>
-            <KeyboardAvoidingWrapper>
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <View style={{ flex: 1, backgroundColor: '#FFF', borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
-                        <FlashMessage position="top" style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }} />
-                        <View style={styles.formContainer}>
-                            <TextInput style={styles.input}
-                                placeholder='Username'
-                                value={input.username}
-                                onChangeText={text => onChangeValue(text, 'username')}
-                            />
-                            <TextInput style={styles.input}
-                                placeholder='Email'
-                                value={input.email}
-                                onChangeText={text => onChangeValue(text, 'email')}
-                            />
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextInput style={styles.input}
-                                    secureTextEntry={hidePassword}
-                                    placeholder='Password'
-                                    value={input.password}
-                                    onChangeText={text => onChangeValue(text, 'password')}
-                                />
-                                <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name={hidePassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TextInput style={styles.input}
-                                    secureTextEntry={hideConfirmPassword}
-                                    placeholder='Confirm Password'
-                                    value={input.confirmPassword}
-                                    onChangeText={text => onChangeValue(text, 'confirmPassword')}
-                                />
-                                <FontAwesome5 onPress={() => setConfirmHidePassword(!hideConfirmPassword)} name={hideConfirmPassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
-                            </View>
-                            <View style={{ flexDirection: 'row', gap: 5 }}>
-                                <Text>Already have an account?</Text>
-                                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                                    <Text style={{ color: 'blue' }}>Login here</Text>
-                                </TouchableOpacity>
-                            </View>
-                            {/* TODO: SIGN UP */}
-                            <Button onPress={() => handleValidation()} title='Sign Up' titleSize={20} titleWeight={'500'} buttonColor='#f4ca1a' />
-                        </View>
-                        <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
-                            Or
-                        </Text>
-                        <TouchableOpacity style={styles.googleButton}>
-                            <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
-                            <Text style={{ fontWeight: '500', fontSize: 15 }}>Sign Up with Google</Text>
+            <AlertNotificationRoot>
+                <Loader visible={loading} />
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View>
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                            <FontAwesome5 name={'arrow-left'} solid size={20} />
                         </TouchableOpacity>
+                        <View style={{ marginLeft: 20, marginTop: 40 }}>
+                            <Text style={{ fontSize: 45, color: '#fff' }}>Sign Up Form</Text>
+                            <Text style={{ fontSize: 20, color: '#fff' }}>Create a new account</Text>
+                        </View>
                     </View>
-                </ScrollView>
-            </KeyboardAvoidingWrapper>
+                </SafeAreaView>
+                <KeyboardAvoidingWrapper>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                        <View style={{ flex: 1, backgroundColor: '#FFF', borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
+                            <FlashMessage position="top" style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }} />
+                            <View style={styles.formContainer}>
+                                <TextInput style={styles.input}
+                                    placeholder='Username'
+                                    value={input.username}
+                                    onChangeText={text => onChangeValue(text, 'username')}
+                                />
+                                <TextInput style={styles.input}
+                                    placeholder='Email'
+                                    value={input.email}
+                                    onChangeText={text => onChangeValue(text, 'email')}
+                                />
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TextInput style={styles.input}
+                                        secureTextEntry={hidePassword}
+                                        placeholder='Password'
+                                        value={input.password}
+                                        onChangeText={text => onChangeValue(text, 'password')}
+                                    />
+                                    <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name={hidePassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TextInput style={styles.input}
+                                        secureTextEntry={hideConfirmPassword}
+                                        placeholder='Confirm Password'
+                                        value={input.confirmPassword}
+                                        onChangeText={text => onChangeValue(text, 'confirmPassword')}
+                                    />
+                                    <FontAwesome5 onPress={() => setConfirmHidePassword(!hideConfirmPassword)} name={hideConfirmPassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
+                                </View>
+                                <View style={{ flexDirection: 'row', gap: 5 }}>
+                                    <Text>Already have an account?</Text>
+                                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                        <Text style={{ color: 'blue' }}>Login here</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                {/* TODO: SIGN UP */}
+                                <Button onPress={() => handleValidation()} title='Sign Up' titleSize={20} titleWeight={'500'} buttonColor='#f4ca1a' />
+                            </View>
+                            <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
+                                Or
+                            </Text>
+                            <TouchableOpacity style={styles.googleButton}>
+                                <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
+                                <Text style={{ fontWeight: '500', fontSize: 15 }}>Sign Up with Google</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingWrapper>
+            </AlertNotificationRoot>
         </View >
     )
 }
