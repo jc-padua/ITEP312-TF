@@ -1,17 +1,63 @@
+import React, { useEffect, useState } from 'react'
 import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
-import { COLORS } from '../constants/colors'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useNavigation } from '@react-navigation/native';
+// TODO: GATHER ALL COLOR AND PUT IT IN THIS CONSTANT FOLDER
+import { COLORS } from '../constants/colors'
+// TODO-END
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import Button from '../components/Button';
+import Loader from '../components/Loader';
+
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
-import Loader from '../components/Loader';
+
+import 'expo-dev-client';
+
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+
 
 const LoginScreen = ({ navigation }) => {
+    GoogleSignin.configure({
+        webClientId: '161316532389-fd7vff4j2b9lme7q41pe1o5h83dlc58l.apps.googleusercontent.com',
+    });
+
+    const onGoogleButtonPress = async () => {
+        // Check if your device supports Google Play
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        // Get the users ID token
+        const { idToken } = await GoogleSignin.signIn();
+
+        // Create a Google credential with the token
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+        // Sign-in the user with the credential
+        // return auth().signInWithCredential(googleCredential);
+        const user_sign_in = auth().signInWithCredential(googleCredential);
+
+    }
+
+    // Set an initializing state whilst Firebase connects
+    const [initializing, setInitializing] = useState(true);
+    const [user, setUser] = useState();
+
+    // Handle user state changes
+    function onAuthStateChanged(user) {
+        setUser(user);
+        if (initializing) setInitializing(false);
+    }
+
+    useEffect(() => {
+        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+        return subscriber; // unsubscribe on unmount
+    }, []);
+
+    if (user) {
+        navigation.navigate('Home')
+    }
+
     const [hidePassword, setHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);
 
@@ -134,7 +180,7 @@ const LoginScreen = ({ navigation }) => {
                             <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
                                 Or
                             </Text>
-                            <TouchableOpacity style={styles.googleButton}>
+                            <TouchableOpacity onPress={() => { onGoogleButtonPress().then(() => console.log('Signed in with Google!')) }} style={styles.googleButton}>
                                 <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
                                 <Text style={{ fontSize: 20 }}>Login with Google</Text>
                             </TouchableOpacity>
