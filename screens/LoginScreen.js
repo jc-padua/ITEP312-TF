@@ -180,7 +180,7 @@ const LoginScreen = ({ navigation }) => {
                             <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
                                 Or
                             </Text>
-                            <TouchableOpacity onPress={() => { onGoogleButtonPress().then(() => console.log('Signed in with Google!')) }} style={styles.googleButton}>
+                            <TouchableOpacity onPress={() => onGoogleButtonPress()} style={styles.googleButton}>
                                 <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
                                 <Text style={{ fontSize: 20 }}>Login with Google</Text>
                             </TouchableOpacity>
