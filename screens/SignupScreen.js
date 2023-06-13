@@ -1,5 +1,5 @@
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { COLORS } from '../constants/colors'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -7,14 +7,16 @@ import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import Button from '../components/Button';
 import FlashMessage, { showMessage, hideMessage } from 'react-native-flash-message';
 import Loader from '../components/Loader';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
+import { useNavigation } from '@react-navigation/native';
+import auth from "@react-native-firebase/auth";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-const SignupScreen = ({ navigation }) => {
+const SignupScreen = () => {
     const [hidePassword, setHidePassword] = useState(true);
     const [hideConfirmPassword, setConfirmHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);
-    // const navigation = useNavigation();
+    const navigation = useNavigation();
 
     const [input, setInput] = useState({
         username: "",
@@ -37,21 +39,24 @@ const SignupScreen = ({ navigation }) => {
         })
     }
 
-    const register = async () => {
-        setLoading(true);
+    const userSignUp = () => {
+        setLoading(true)
         try {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-
-            await AsyncStorage.setItem('userData', JSON.stringify(input));
-
             Dialog.show({
                 type: ALERT_TYPE.SUCCESS,
                 title: 'Success',
                 textBody: 'User Successfully Created!',
                 button: 'close',
                 autoClose: 500,
-                onHide: () => navigation.navigate('Login'),
-            });
+                onHide: async () => {
+                    await auth().createUserWithEmailAndPassword(input.email, input.password);
+                    const user = auth().currentUser;
+                    await user.updateProfile({ displayName: input.username });
+                    // navigation.navigate('Login')
+                }, // Manually navigate to the login screen
+            })
+
+
         } catch (error) {
             Dialog.show({
                 type: ALERT_TYPE.DANGER,
@@ -64,7 +69,6 @@ const SignupScreen = ({ navigation }) => {
             setLoading(false);
         }
     };
-
 
     const handleValidation = () => {
         if (!input.username) {
@@ -82,9 +86,44 @@ const SignupScreen = ({ navigation }) => {
         } else if (input.password != input.confirmPassword) {
             errorMessage('Password not match', 'danger')
         } else {
-            register()
+            userSignUp()
         }
     }
+
+    GoogleSignin.configure({
+        webClientId: '161316532389-t2krjjejv7f1t0nfe6j4kt7ob7d1c81k.apps.googleusercontent.com',
+    });
+
+    const googleSignUp = async () => {
+        try {
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            const { idToken, user } = await GoogleSignin.signIn();
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            const userData = await auth().signInWithCredential(googleCredential);
+            // console.log(userData);
+        } catch (error) {
+            console.log('Google Sign-in Error:', error);
+        }
+    }
+
+    // Set an initializing state whilst Firebase connects
+    const [initializing, setInitializing] = useState(true);
+    const [user, setUser] = useState();
+
+    // Handle user state changes
+    function onAuthStateChanged(user) {
+        setUser(user);
+        if (initializing) setInitializing(false);
+    }
+
+    useEffect(() => {
+        const subscriber = auth().onAuthStateChanged((user) => {
+            if (user) {
+                navigation.navigate('Home');
+            }
+        });
+        return subscriber; // unsubscribe on unmount
+    }, []);
 
 
     return (
@@ -93,7 +132,7 @@ const SignupScreen = ({ navigation }) => {
                 <Loader visible={loading} />
                 <SafeAreaView style={{ flex: 1 }}>
                     <View>
-                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Welcome')} style={styles.backButton}>
                             <FontAwesome5 name={'arrow-left'} solid size={20} />
                         </TouchableOpacity>
                         <View style={{ marginLeft: 20, marginTop: 40 }}>
@@ -141,13 +180,12 @@ const SignupScreen = ({ navigation }) => {
                                         <Text style={{ color: 'blue' }}>Login here</Text>
                                     </TouchableOpacity>
                                 </View>
-                                {/* TODO: SIGN UP */}
                                 <Button onPress={() => handleValidation()} title='Sign Up' titleSize={20} titleWeight={'500'} buttonColor='#f4ca1a' />
                             </View>
                             <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
                                 Or
                             </Text>
-                            <TouchableOpacity style={styles.googleButton}>
+                            <TouchableOpacity onPress={() => googleSignUp()} style={styles.googleButton}>
                                 <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
                                 <Text style={{ fontWeight: '500', fontSize: 15 }}>Sign Up with Google</Text>
                             </TouchableOpacity>
@@ -206,6 +244,14 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         padding: 15,
         borderRadius: 15,
-        marginBottom: 40
-    }
+        marginBottom: 40,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 2,
+    },
 })

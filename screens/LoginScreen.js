@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-// TODO: GATHER ALL COLOR AND PUT IT IN THIS CONSTANT FOLDER
 import { COLORS } from '../constants/colors'
-// TODO-END
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
+import { ALERT_TYPE, AlertNotificationRoot, Dialog, Toast } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 
@@ -17,26 +15,21 @@ import 'expo-dev-client';
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
+    const navigation = useNavigation();
+
     GoogleSignin.configure({
-        webClientId: '161316532389-fd7vff4j2b9lme7q41pe1o5h83dlc58l.apps.googleusercontent.com',
+        webClientId: '161316532389-t2krjjejv7f1t0nfe6j4kt7ob7d1c81k.apps.googleusercontent.com',
     });
 
     const onGoogleButtonPress = async () => {
-        // Check if your device supports Google Play
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        // Get the users ID token
         const { idToken } = await GoogleSignin.signIn();
-
-        // Create a Google credential with the token
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-
-        // Sign-in the user with the credential
-        // return auth().signInWithCredential(googleCredential);
-        const user_sign_in = auth().signInWithCredential(googleCredential);
-
+        auth().signInWithCredential(googleCredential);
     }
 
     // Set an initializing state whilst Firebase connects
@@ -50,13 +43,14 @@ const LoginScreen = ({ navigation }) => {
     }
 
     useEffect(() => {
-        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+        const subscriber = auth().onAuthStateChanged((user) => {
+            if (user) {
+                navigation.navigate('Home');
+            }
+        });
+
         return subscriber; // unsubscribe on unmount
     }, []);
-
-    if (user) {
-        navigation.navigate('Home')
-    }
 
     const [hidePassword, setHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -80,37 +74,17 @@ const LoginScreen = ({ navigation }) => {
         })
     }
 
-    const handleValidation = () => {
-        if (!input.email) {
-            errorMessage('Please enter a email address', 'danger')
-        } else if (!input.email.match(/\S+@\S+\.\S+/)) {
-            errorMessage('Please enter valid email address', 'danger')
-        } else if (!input.password) {
-            errorMessage('Please enter a password', 'danger')
-        } else {
-            login()
-        }
-    }
-
-    const login = async () => {
+    const userSignIn = async () => {
         setLoading(true);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const userData = await auth().signInWithEmailAndPassword(input.email, input.password);
 
-            const userData = await AsyncStorage.getItem('userData');
             if (userData) {
-                const parsedUserData = JSON.parse(userData);
-                if (input.email === parsedUserData.email && input.password === parsedUserData.password) {
-                    navigation.navigate('Home')
-                } else {
-                    Dialog.show({
-                        type: ALERT_TYPE.DANGER,
-                        title: 'Error',
-                        textBody: 'Incorrect Email / Password',
-                        button: 'close',
-                        autoClose: 500,
-                    });
-                }
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "Login Successful",
+                    autoClose: 500,
+                })
             } else {
                 Dialog.show({
                     type: ALERT_TYPE.DANGER,
@@ -123,18 +97,29 @@ const LoginScreen = ({ navigation }) => {
         } catch (error) {
             Dialog.show({
                 type: ALERT_TYPE.DANGER,
-                title: 'Error',
-                textBody: error.toString(),
+                // title: 'Error',
+                textBody: 'Account doesn\'t exist!',
                 button: 'close',
-                autoClose: 500,
+                autoClose: 2000,
             });
         } finally {
             setLoading(false);
         }
     };
 
+    const handleValidation = () => {
+        if (!input.email) {
+            errorMessage('Please enter a email address', 'danger')
+        } else if (!input.email.match(/\S+@\S+\.\S+/)) {
+            errorMessage('Please enter valid email address', 'danger')
+        } else if (!input.password) {
+            errorMessage('Please enter a password', 'danger')
+        } else {
+            userSignIn()
+        }
+    }
 
-    // const navigation = useNavigation();
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -144,7 +129,7 @@ const LoginScreen = ({ navigation }) => {
                 <Loader visible={loading} />
                 <SafeAreaView style={{ flex: 1 }}>
                     <View>
-                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Welcome')} style={styles.backButton}>
                             <FontAwesome5 name={'arrow-left'} solid size={20} />
                         </TouchableOpacity>
                         <View style={{ marginLeft: 20, marginTop: 40 }}>
@@ -188,7 +173,7 @@ const LoginScreen = ({ navigation }) => {
                                 <Text style={{ fontSize: 15 }}>
                                     Don't have an account?
                                 </Text>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
                                     <Text style={{ fontSize: 15 }}>Sign Up</Text>
                                 </TouchableOpacity>
                             </View>
@@ -247,5 +232,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         padding: 15,
         borderRadius: 15,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 2,
     }
 })
