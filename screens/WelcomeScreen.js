@@ -12,7 +12,9 @@ const WelcomeScreen = () => {
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged((user) => {
-
+            if (user) {
+                navigation.navigate('Dashboard')
+            }
         });
 
         return subscriber; // unsubscribe on unmount

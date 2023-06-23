@@ -26,31 +26,22 @@ const LoginScreen = () => {
     });
 
     const onGoogleButtonPress = async () => {
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        const { idToken } = await GoogleSignin.signIn();
-        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-        auth().signInWithCredential(googleCredential);
-
-    }
-
-    const [initializing, setInitializing] = useState(true);
-    const [user, setUser] = useState();
-
-    function onAuthStateChanged(user) {
-        setUser(user);
-        if (initializing) setInitializing(false);
-    }
-
-    useEffect(() => {
-        const subscriber = auth().onAuthStateChanged((user) => {
-            if (user) {
-                navigation.navigate('Dashboard')
+        try {
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            const { idToken } = await GoogleSignin.signIn();
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            const userData = await auth().signInWithCredential(googleCredential);
+            if (userData.additionalUserInfo.isNewUser) {
+                navigation.navigate('ProfileSetup')
+                console.log('ProfileSetup');
+            } else {
+                // navigation.navigate('Dashboard')
+                console.log('Dashboard');
             }
-        });
-        return subscriber; // unsubscribe on unmount
-    }, []);
-
-
+        } catch (error) {
+            console.log('Google Sign-in Error:', error);
+        }
+    }
 
     const [hidePassword, setHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);

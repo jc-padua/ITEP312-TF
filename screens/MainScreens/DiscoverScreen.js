@@ -66,7 +66,6 @@ export default DiscoverScreen
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.bg
     },
     cardContainer: {
         gap: 20

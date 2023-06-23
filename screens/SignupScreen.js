@@ -1,6 +1,5 @@
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { COLORS } from '../constants/colors'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
@@ -18,6 +17,7 @@ const SignupScreen = () => {
     const [hideConfirmPassword, setConfirmHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
+
 
     const [input, setInput] = useState({
         username: "",
@@ -54,10 +54,8 @@ const SignupScreen = () => {
                     const user = auth().currentUser;
                     await user.updateProfile({ displayName: input.username });
                     // navigation.navigate('Login')
-                }, // Manually navigate to the login screen
+                },
             })
-
-
         } catch (error) {
             Dialog.show({
                 type: ALERT_TYPE.DANGER,
@@ -91,45 +89,38 @@ const SignupScreen = () => {
         }
     }
 
-    // Google SignUp
-
     GoogleSignin.configure({
         webClientId: '161316532389-t2krjjejv7f1t0nfe6j4kt7ob7d1c81k.apps.googleusercontent.com',
     });
 
-
-    const [isNewUser, setNewUser] = useState(false);
-
+    // FIXME: IF THE USER is newUser then display the Profile Setup first before Dashboard.
     const googleSignUp = async () => {
         try {
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-            const { idToken, user } = await GoogleSignin.signIn();
+            const { idToken } = await GoogleSignin.signIn();
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-            const userData = await auth().signInWithCredential(googleCredential);
-            if (userData.additionalUserInfo.isNewUser) {
-                navigation.navigate('ProfileSetup')
-            } else {
-                navigation.navigate('Dashboard')
-            }
+            await auth().signInWithCredential(googleCredential)
+                .then((userData) => {
+                    if (userData.additionalUserInfo.isNewUser) {
+                        console.log('ProfileSetup');
+                        navigation.navigate('ProfileSetup')
+                    } else {
+                        console.log('Dashboard');
+                        navigation.navigate('Dashboard')
+                    }
+                });
         } catch (error) {
             console.log('Google Sign-in Error:', error);
         }
     }
 
-    // const [initializing, setInitializing] = useState(true);
-    // const [user, setUser] = useState();
-
-    // function onAuthStateChanged(user) {
-    //     setUser(user);
-    //     if (initializing) setInitializing(false);
-    // }
-
-    useEffect(() => {
-        const subscriber = auth().onAuthStateChanged((user) => {
-
-        });
-        return subscriber; // unsubscribe on unmount
-    }, []);
+    // On load checks if there is a user logged in
+    // useEffect(() => {
+    //     const subscriber = auth().onAuthStateChanged((user) => {
+    //         console.log(user);
+    //     });
+    //     return subscriber; // unsubscribe on unmount
+    // }, []);
 
 
     return (

@@ -1,21 +1,30 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../../constants/colors'
 import auth from "@react-native-firebase/auth"
 import { useNavigation } from '@react-navigation/native'
 const DashboardScreen = () => {
-    const navigation = useNavigation();
     const [displayName, setDisplayName] = useState('');
+
+    useEffect(() => {
+        const disableBackButton = () => {
+            // Disable the back button functionality
+            return true;
+        };
+
+        // Disable the back button when the component mounts
+        BackHandler.addEventListener('hardwareBackPress', disableBackButton);
+
+        return () => {
+            // Enable the back button when the component unmounts
+            BackHandler.removeEventListener('hardwareBackPress', disableBackButton);
+        };
+    }, []);
 
     const reloadDisplayName = async () => {
         const user = await auth().currentUser;
-
-        //TODO: If newUser setup the profile details page
-
         if (user) {
             setDisplayName(user.displayName);
-        } else {
-            setDisplayName('');
         }
     };
 
@@ -28,12 +37,6 @@ const DashboardScreen = () => {
             clearTimeout(timeoutId);
         };
     }, []);
-
-    useEffect(() => {
-        auth().onAuthStateChanged(() => {
-
-        })
-    })
 
     return (
         <ScrollView>
