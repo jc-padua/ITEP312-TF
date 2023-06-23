@@ -57,7 +57,6 @@ const ForgotScreen = () => {
                             <FontAwesome5 name={'arrow-left'} solid size={20} />
                         </TouchableOpacity>
                         {/* <Text style={{ fontSize: 50, color: '#FFF' }}>Hi!</Text> */}
-                        <Image source={require("../assets/images/signup.png")} style={{ width: 200, height: 200, alignSelf: 'center' }} />
                     </View>
                 </SafeAreaView>
                 <KeyboardAvoidingWrapper>

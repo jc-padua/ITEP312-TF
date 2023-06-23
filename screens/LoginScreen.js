@@ -8,7 +8,6 @@ import Loader from '../components/Loader';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { ALERT_TYPE, AlertNotificationRoot, Dialog, Toast } from 'react-native-alert-notification';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 
 import 'expo-dev-client';
@@ -30,13 +29,12 @@ const LoginScreen = () => {
         const { idToken } = await GoogleSignin.signIn();
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
         auth().signInWithCredential(googleCredential);
+
     }
 
-    // Set an initializing state whilst Firebase connects
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
 
-    // Handle user state changes
     function onAuthStateChanged(user) {
         setUser(user);
         if (initializing) setInitializing(false);
@@ -45,12 +43,13 @@ const LoginScreen = () => {
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged((user) => {
             if (user) {
-                navigation.navigate('Home');
+                navigation.navigate('Dashboard')
             }
         });
-
         return subscriber; // unsubscribe on unmount
     }, []);
+
+
 
     const [hidePassword, setHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);

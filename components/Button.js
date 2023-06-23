@@ -9,6 +9,7 @@ const Button = ({
     titleSize,
     titleWeight,
     buttonColor = 'blue',
+    textAlign,
     iconName,
     iconSize = 0,
     iconColor,

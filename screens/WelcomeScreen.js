@@ -11,9 +11,7 @@ const WelcomeScreen = () => {
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged((user) => {
-            if (user) {
-                navigation.navigate('Home');
-            }
+
         });
 
         return subscriber; // unsubscribe on unmount

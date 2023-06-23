@@ -3,16 +3,20 @@ import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const HomeScreen = () => {
     const navigation = useNavigation();
     const [displayName, setDisplayName] = useState('');
 
+    console.log(auth().currentUser);
     const reloadDisplayName = async () => {
         const user = await auth().currentUser;
+
+        //If newUser setup the profile details page
+
         if (user) {
             setDisplayName(user.displayName);
-            console.log(user);
         } else {
             setDisplayName('');
         }

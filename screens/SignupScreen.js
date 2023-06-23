@@ -90,9 +90,14 @@ const SignupScreen = () => {
         }
     }
 
+    // Google SignUp
+
     GoogleSignin.configure({
         webClientId: '161316532389-t2krjjejv7f1t0nfe6j4kt7ob7d1c81k.apps.googleusercontent.com',
     });
+
+
+    const [isNewUser, setNewUser] = useState(false);
 
     const googleSignUp = async () => {
         try {
@@ -100,27 +105,27 @@ const SignupScreen = () => {
             const { idToken, user } = await GoogleSignin.signIn();
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
             const userData = await auth().signInWithCredential(googleCredential);
-            // console.log(userData);
+            if (userData.additionalUserInfo.isNewUser) {
+                navigation.navigate('ProfileSetup')
+            } else {
+                navigation.navigate('Dashboard')
+            }
         } catch (error) {
             console.log('Google Sign-in Error:', error);
         }
     }
 
-    // Set an initializing state whilst Firebase connects
-    const [initializing, setInitializing] = useState(true);
-    const [user, setUser] = useState();
+    // const [initializing, setInitializing] = useState(true);
+    // const [user, setUser] = useState();
 
-    // Handle user state changes
-    function onAuthStateChanged(user) {
-        setUser(user);
-        if (initializing) setInitializing(false);
-    }
+    // function onAuthStateChanged(user) {
+    //     setUser(user);
+    //     if (initializing) setInitializing(false);
+    // }
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged((user) => {
-            if (user) {
-                navigation.navigate('Home');
-            }
+
         });
         return subscriber; // unsubscribe on unmount
     }, []);
