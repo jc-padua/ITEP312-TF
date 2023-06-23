@@ -15,6 +15,7 @@ import 'expo-dev-client';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const LoginScreen = () => {
@@ -120,67 +121,74 @@ const LoginScreen = () => {
 
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1, backgroundColor: COLORS.bg }}
+        <LinearGradient
+            colors={['salmon', 'white']}
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
         >
-            <AlertNotificationRoot>
-                <Loader visible={loading} />
-                <SafeAreaView style={{ flex: 1 }}>
-                    <View>
-                        <TouchableOpacity onPress={() => navigation.navigate('Welcome')} style={styles.backButton}>
-                            <FontAwesome5 name={'arrow-left'} solid size={20} />
-                        </TouchableOpacity>
-                        <View style={{ marginLeft: 20, marginTop: 40 }}>
-                            <Text style={{ fontSize: 45, color: '#fff' }}>Login Form</Text>
-                            <Text style={{ fontSize: 20, color: '#fff', }}>Sign in to continue</Text>
-                        </View>
-                    </View>
-                </SafeAreaView>
-                <KeyboardAvoidingWrapper>
-                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                        <View style={{ flex: 1, backgroundColor: '#FFF', height: 600, borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
-                            <FlashMessage position="top" style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }} />
-                            <View style={styles.formContainer}>
-                                <TextInput style={styles.input}
-                                    placeholder='Email'
-                                    onChangeText={(text) => {
-                                        onChangeValue(text, 'email')
-                                    }}
-                                />
-                                <View style={{ flexDirection: 'row' }}>
-                                    <TextInput style={styles.input}
-                                        secureTextEntry={hidePassword}
-                                        placeholder='Password'
-                                        onChangeText={(text) => onChangeValue(text, 'password')}
-                                    />
-                                    <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name={hidePassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
-                                </View>
-                                <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
-                                    <Text style={{ alignSelf: 'flex-end', marginVertical: 5, fontSize: 15 }}>Forgot Password?</Text>
-                                </TouchableOpacity>
-                                <Button onPress={() => handleValidation()} title={'Login'} buttonColor='#f4ca1a' titleSize={20} titleWeight={'500'} />
-                            </View>
-                            <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
-                                Or
-                            </Text>
-                            <TouchableOpacity onPress={() => onGoogleButtonPress()} style={styles.googleButton}>
-                                <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
-                                <Text style={{ fontSize: 20 }}>Login with Google</Text>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <AlertNotificationRoot>
+                    <Loader visible={loading} />
+                    <SafeAreaView style={{ flex: 1 }}>
+                        <View>
+                            <TouchableOpacity onPress={() => navigation.navigate('Welcome')} style={styles.backButton}>
+                                <FontAwesome5 name={'arrow-left'} solid size={20} />
                             </TouchableOpacity>
-                            <View style={{ flexDirection: 'row', gap: 5, alignSelf: 'center', marginVertical: 30 }}>
-                                <Text style={{ fontSize: 15 }}>
-                                    Don't have an account?
-                                </Text>
-                                <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                                    <Text style={{ fontSize: 15 }}>Sign Up</Text>
-                                </TouchableOpacity>
+                            <View style={{ marginLeft: 20, marginTop: 40 }}>
+                                <Text style={{ fontSize: 45, color: '#fff' }}>Login Form</Text>
+                                <Text style={{ fontSize: 20, color: '#fff', }}>Sign in to continue</Text>
                             </View>
                         </View>
-                    </ScrollView>
-                </KeyboardAvoidingWrapper>
-            </AlertNotificationRoot>
-        </KeyboardAvoidingView >
+                    </SafeAreaView>
+                    <KeyboardAvoidingWrapper>
+                        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                            <View style={{ flex: 1, backgroundColor: '#FFF', height: 600, borderTopLeftRadius: 30, borderTopRightRadius: 30 }}>
+                                <FlashMessage position="top" style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }} />
+                                <View style={styles.formContainer}>
+                                    <TextInput style={styles.input}
+                                        placeholder='Email'
+                                        onChangeText={(text) => {
+                                            onChangeValue(text, 'email')
+                                        }}
+                                    />
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <TextInput style={styles.input}
+                                            secureTextEntry={hidePassword}
+                                            placeholder='Password'
+                                            onChangeText={(text) => onChangeValue(text, 'password')}
+                                        />
+                                        <FontAwesome5 onPress={() => setHidePassword(!hidePassword)} name={hidePassword ? 'eye' : 'eye-slash'} style={styles.passwordShow} size={25} />
+                                    </View>
+                                    <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
+                                        <Text style={{ alignSelf: 'flex-end', marginVertical: 5, fontSize: 15 }}>Forgot Password?</Text>
+                                    </TouchableOpacity>
+                                    <Button onPress={() => handleValidation()} title={'Login'} buttonColor='#f4ca1a' titleSize={20} titleWeight={'500'} />
+                                </View>
+                                <Text style={{ fontSize: 15, margin: 4, textAlign: 'center' }}>
+                                    Or
+                                </Text>
+                                <TouchableOpacity onPress={() => onGoogleButtonPress()} style={styles.googleButton}>
+                                    <Image source={require('../assets/images/google-icon.png')} style={{ width: 40, height: 40 }} />
+                                    <Text style={{ fontSize: 20 }}>Login with Google</Text>
+                                </TouchableOpacity>
+                                <View style={{ flexDirection: 'row', gap: 5, alignSelf: 'center', marginVertical: 30 }}>
+                                    <Text style={{ fontSize: 15 }}>
+                                        Don't have an account?
+                                    </Text>
+                                    <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                                        <Text style={{ fontSize: 15 }}>Sign Up</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </KeyboardAvoidingWrapper>
+                </AlertNotificationRoot>
+            </KeyboardAvoidingView >
+        </LinearGradient>
     )
 }
 

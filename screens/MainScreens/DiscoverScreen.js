@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, ImageBackground, ScrollView } from 'react-native'
 import React from 'react'
 import { COLORS } from '../../constants/colors'
+import { LinearGradient } from 'expo-linear-gradient';
 
 // FIXME: LAYOUT
 const DiscoverScreen = () => {
@@ -14,26 +15,45 @@ const DiscoverScreen = () => {
                             source={require('../../assets/images/article.png')}
                             resizeMode='cover'
                             style={styles.image}>
-                            <Text style={styles.cardTitle}>Article</Text>
                         </ImageBackground>
+                        <LinearGradient
+                            colors={['salmon', 'pink', 'orange']}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={{ opacity: 0.8 }}
+                        >
+                            <Text style={styles.cardTitle}>Article</Text>
+                        </LinearGradient>
                     </View>
                     <View style={[styles.card, { backgroundColor: '#7bfcda' }]}>
                         <ImageBackground
                             source={require('../../assets/images/supportlink.png')}
                             resizeMode='cover'
                             style={styles.image}>
-                            <Text style={styles.cardTitle}>Support Links</Text>
-
                         </ImageBackground>
+                        <LinearGradient
+                            colors={['salmon', 'pink', 'orange']}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={{ opacity: 0.8 }}
+                        >
+                            <Text style={styles.cardTitle}>Support Links</Text>
+                        </LinearGradient>
                     </View>
                     <View style={[styles.card, { backgroundColor: '#ffe5d0' }]}>
                         <ImageBackground
                             source={require('../../assets/images/aboutus.png')}
                             resizeMode='cover'
                             style={styles.image}>
-                            <Text style={styles.cardTitle}>About Us</Text>
-
                         </ImageBackground>
+                        <LinearGradient
+                            colors={['salmon', 'pink', 'orange']}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={{ opacity: 0.8 }}
+                        >
+                            <Text style={styles.cardTitle}>About Us</Text>
+                        </LinearGradient>
                     </View>
                 </View>
             </ScrollView>
@@ -58,18 +78,10 @@ const styles = StyleSheet.create({
     },
     card: {
         height: 250,
-        borderRadius: 20,
-        marginHorizontal: 10,
-        borderWidth: 2,
         position: 'relative'
     },
     cardTitle: {
         fontSize: 35,
-        backgroundColor: 'salmon',
-        position: 'absolute',
-        left: -80,
-        bottom: 0,
-        borderBottomLeftRadius: 20,
         width: '100%'
     }
 })
