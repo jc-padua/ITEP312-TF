@@ -1,5 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { WEBCLIENT_ID } from '@env'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
@@ -17,7 +18,6 @@ const SignupScreen = () => {
     const [hideConfirmPassword, setConfirmHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
-
 
     const [input, setInput] = useState({
         username: "",
@@ -54,6 +54,7 @@ const SignupScreen = () => {
                     const user = auth().currentUser;
                     await user.updateProfile({ displayName: input.username });
                     // navigation.navigate('Login')
+                    // TODO: Add clear inputs value 
                 },
             })
         } catch (error) {
@@ -90,7 +91,7 @@ const SignupScreen = () => {
     }
 
     GoogleSignin.configure({
-        webClientId: '161316532389-t2krjjejv7f1t0nfe6j4kt7ob7d1c81k.apps.googleusercontent.com',
+        webClientId: WEBCLIENT_ID,
     });
 
     // FIXME: IF THE USER is newUser then display the Profile Setup first before Dashboard.
@@ -102,10 +103,8 @@ const SignupScreen = () => {
             await auth().signInWithCredential(googleCredential)
                 .then((userData) => {
                     if (userData.additionalUserInfo.isNewUser) {
-                        console.log('ProfileSetup');
                         navigation.navigate('ProfileSetup')
                     } else {
-                        console.log('Dashboard');
                         navigation.navigate('Dashboard')
                     }
                 });

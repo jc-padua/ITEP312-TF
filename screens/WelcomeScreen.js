@@ -16,8 +16,7 @@ const WelcomeScreen = () => {
                 navigation.navigate('Dashboard')
             }
         });
-
-        return subscriber; // unsubscribe on unmount
+        return subscriber;
     }, []);
 
     return (

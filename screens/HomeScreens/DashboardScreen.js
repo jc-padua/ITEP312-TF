@@ -1,22 +1,17 @@
-import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { BackHandler, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../../constants/colors'
 import auth from "@react-native-firebase/auth"
 import { useNavigation } from '@react-navigation/native'
-const DashboardScreen = () => {
+const DashboardScreen = ({ navigation }) => {
     const [displayName, setDisplayName] = useState('');
-
+    // Disable Back Button
     useEffect(() => {
         const disableBackButton = () => {
-            // Disable the back button functionality
             return true;
         };
-
-        // Disable the back button when the component mounts
         BackHandler.addEventListener('hardwareBackPress', disableBackButton);
-
         return () => {
-            // Enable the back button when the component unmounts
             BackHandler.removeEventListener('hardwareBackPress', disableBackButton);
         };
     }, []);
@@ -38,6 +33,8 @@ const DashboardScreen = () => {
         };
     }, []);
 
+
+
     return (
         <ScrollView>
             <View style={styles.container}>
@@ -47,12 +44,16 @@ const DashboardScreen = () => {
                         <Text>Welcome back!</Text>
                     </View>
                     <View style={styles.badgesContainer}>
-                        <View style={{ borderRadius: 25, backgroundColor: '#fad6c0', alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', padding: 20 }}>
-                            <Text>BADGES</Text>
-                        </View>
-                        <View style={{ borderRadius: 25, backgroundColor: '#777cbb', alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', padding: 20 }}>
-                            <Text>ACHIEVEMENTS</Text>
-                        </View>
+                        <TouchableOpacity style={{ borderRadius: 25, backgroundColor: '#fad6c0', alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', padding: 20 }}>
+                            <View >
+                                <Text>SUPPORT LINK</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ borderRadius: 25, backgroundColor: '#777cbb', alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', padding: 20 }}>
+                            <View>
+                                <Text>ACHIEVEMENTS</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.lowerContainer}>

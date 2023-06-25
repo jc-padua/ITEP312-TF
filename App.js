@@ -8,30 +8,27 @@ import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import ForgotScreen from './screens/ForgotScreen';
-import ProfileSetupPage from './screens/ProfileDetails/ProfileSetupPage';
+import ProfileSetupPage from './screens/OtherScreen/ProfileSetupPage';
 import SuccessfulPage from './screens/OtherScreen/SuccessfulPage';
 import WelcomeUser from './screens/OtherScreen/WelcomeUser';
-import DashboardScreen from './screens/MainScreens/DashboardScreen';
-import DiscoverScreen from './screens/MainScreens/DiscoverScreen';
-import ProfileScreen from './screens/MainScreens/ProfileScreen';
-import GameScreen from './screens/MainScreens/GameScreen';
+import DashboardScreen from './screens/HomeScreens/DashboardScreen';
+import DiscoverScreen from './screens/DiscoverScreens/DiscoverScreen';
+import ProfileScreen from './screens/ProfileScreens/ProfileScreen';
+import GameScreen from './screens/GameScreens/GameScreen';
+import GameCategoriesPage from './screens/GameScreens/GameCategoriesPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
+const GameCategoriesStack = createNativeStackNavigator();
 
 const Dashboard = () => {
   return (
-    <Tab.Navigator
-      initialRouteName='Home'
-      backBehavior='none'
-      activeColor='salmon' >
-      <Tab.Screen name='Home'
-        component={DashboardScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
-          )
-        }} />
+    <Tab.Navigator initialRouteName='Home' backBehavior='none' activeColor='salmon' >
+      <Tab.Screen name='Home' component={DashboardScreen} options={{
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="home" color={color} size={26} />
+        )
+      }} />
       <Tab.Screen name='Discover'
         component={DiscoverScreen}
         options={{
@@ -55,6 +52,17 @@ const Dashboard = () => {
           )
         }} />
     </Tab.Navigator>
+  )
+}
+
+const GameCategories = () => {
+  return (
+    <GameCategoriesStack.Navigator initialRouteName='Games'>
+      <GameCategoriesStack.Screen name='GameCategories' component={GameScreen} options={{ headerShown: false }} />
+      {/* <GameCategoriesStack.Screen name='Games' />
+      <GameCategoriesStack.Screen name='Games' />
+      <GameCategoriesStack.Screen name='Games' /> */}
+    </GameCategoriesStack.Navigator>
   )
 }
 

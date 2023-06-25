@@ -16,13 +16,13 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { WEBCLIENT_ID } from '@env'
 
 const LoginScreen = () => {
     const navigation = useNavigation();
 
     GoogleSignin.configure({
-        webClientId: '161316532389-t2krjjejv7f1t0nfe6j4kt7ob7d1c81k.apps.googleusercontent.com',
+        webClientId: WEBCLIENT_ID,
     });
 
     const onGoogleButtonPress = async () => {
@@ -30,14 +30,14 @@ const LoginScreen = () => {
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
             const { idToken } = await GoogleSignin.signIn();
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-            const userData = await auth().signInWithCredential(googleCredential);
-            if (userData.additionalUserInfo.isNewUser) {
-                navigation.navigate('ProfileSetup')
-                console.log('ProfileSetup');
-            } else {
-                // navigation.navigate('Dashboard')
-                console.log('Dashboard');
-            }
+            await auth().signInWithCredential(googleCredential)
+            // .then((userData) => {
+            //     if (userData.additionalUserInfo.isNewUser) {
+            //         navigation.navigate('ProfileSetup')
+            //     } else {
+            //         navigation.navigate('Dashboard')
+            //     }
+            // });
         } catch (error) {
             console.log('Google Sign-in Error:', error);
         }
