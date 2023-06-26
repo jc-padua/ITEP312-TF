@@ -2,21 +2,16 @@ import { BackHandler, ScrollView, StyleSheet, Text, TouchableOpacity, View } fro
 import React, { useEffect, useState } from 'react'
 import { COLORS } from '../../constants/colors'
 import auth from "@react-native-firebase/auth"
-import { useNavigation } from '@react-navigation/native'
+
 const DashboardScreen = ({ navigation }) => {
     const [displayName, setDisplayName] = useState('');
-    // Disable Back Button
-    useEffect(() => {
-        const disableBackButton = () => {
-            return true;
-        };
-        BackHandler.addEventListener('hardwareBackPress', disableBackButton);
-        return () => {
-            BackHandler.removeEventListener('hardwareBackPress', disableBackButton);
-        };
-    }, []);
 
-    const reloadDisplayName = async () => {
+    console.log('Here at Dashboard Screen');
+    console.log('Dashboard Screen');
+
+    // TODO: Disable Back Button
+
+    const displayUserName = async () => {
         const user = await auth().currentUser;
         if (user) {
             setDisplayName(user.displayName);
@@ -24,16 +19,8 @@ const DashboardScreen = ({ navigation }) => {
     };
 
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            reloadDisplayName();
-        }, 1000);
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
+        displayUserName()
     }, []);
-
-
 
     return (
         <ScrollView>
@@ -44,7 +31,7 @@ const DashboardScreen = ({ navigation }) => {
                         <Text>Welcome back!</Text>
                     </View>
                     <View style={styles.badgesContainer}>
-                        <TouchableOpacity style={{ borderRadius: 25, backgroundColor: '#fad6c0', alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', padding: 20 }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Support')} style={{ borderRadius: 25, backgroundColor: '#fad6c0', alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', padding: 20 }}>
                             <View >
                                 <Text>SUPPORT LINK</Text>
                             </View>

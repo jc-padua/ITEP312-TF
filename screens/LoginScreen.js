@@ -14,16 +14,16 @@ import 'expo-dev-client';
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
-import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { WEBCLIENT_ID } from '@env'
 
-const LoginScreen = () => {
-    const navigation = useNavigation();
+const LoginScreen = ({ navigation }) => {
 
     GoogleSignin.configure({
         webClientId: WEBCLIENT_ID,
     });
+
+    console.log('LoginScreen');
 
     const onGoogleButtonPress = async () => {
         try {
@@ -31,13 +31,15 @@ const LoginScreen = () => {
             const { idToken } = await GoogleSignin.signIn();
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
             await auth().signInWithCredential(googleCredential)
-            // .then((userData) => {
-            //     if (userData.additionalUserInfo.isNewUser) {
-            //         navigation.navigate('ProfileSetup')
-            //     } else {
-            //         navigation.navigate('Dashboard')
-            //     }
-            // });
+                .then((userData) => {
+                    if (userData.additionalUserInfo.isNewUser) {
+                        console.log('Go to Profile Setup');
+                        navigation.navigate('ProfileSetup');
+                    } else {
+                        console.log('Go to Dashboard');
+                        navigation.navigate('Dashboard');
+                    }
+                });
         } catch (error) {
             console.log('Google Sign-in Error:', error);
         }
@@ -67,6 +69,7 @@ const LoginScreen = () => {
 
     const userSignIn = async () => {
         setLoading(true);
+        // TODO: Validation if the account is already exist
         try {
             const userData = await auth().signInWithEmailAndPassword(input.email, input.password);
 

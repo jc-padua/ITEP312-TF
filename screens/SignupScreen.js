@@ -94,6 +94,8 @@ const SignupScreen = () => {
         webClientId: WEBCLIENT_ID,
     });
 
+    console.log('SignUpScreen');
+
     // FIXME: IF THE USER is newUser then display the Profile Setup first before Dashboard.
     const googleSignUp = async () => {
         try {
@@ -103,24 +105,17 @@ const SignupScreen = () => {
             await auth().signInWithCredential(googleCredential)
                 .then((userData) => {
                     if (userData.additionalUserInfo.isNewUser) {
-                        navigation.navigate('ProfileSetup')
+                        console.log('Go to Profile Setup');
+                        navigation.navigate('ProfileSetup');
                     } else {
-                        navigation.navigate('Dashboard')
+                        console.log('Go to Dashboard');
+                        navigation.navigate('Dashboard');
                     }
                 });
         } catch (error) {
             console.log('Google Sign-in Error:', error);
         }
     }
-
-    // On load checks if there is a user logged in
-    // useEffect(() => {
-    //     const subscriber = auth().onAuthStateChanged((user) => {
-    //         console.log(user);
-    //     });
-    //     return subscriber; // unsubscribe on unmount
-    // }, []);
-
 
     return (
         <LinearGradient

@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const WelcomeScreen = () => {
     const navigation = useNavigation();
+    console.log('Welcome Screen');
 
     useEffect(() => {
         const subscriber = auth().onAuthStateChanged((user) => {

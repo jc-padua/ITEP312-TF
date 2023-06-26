@@ -16,14 +16,16 @@ import DiscoverScreen from './screens/DiscoverScreens/DiscoverScreen';
 import ProfileScreen from './screens/ProfileScreens/ProfileScreen';
 import GameScreen from './screens/GameScreens/GameScreen';
 import GameCategoriesPage from './screens/GameScreens/GameCategoriesPage';
+import SupportScreen from './screens/OtherScreen/SupportScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
+const OtherScreenStack = createNativeStackNavigator();
 const GameCategoriesStack = createNativeStackNavigator();
 
 const Dashboard = () => {
   return (
-    <Tab.Navigator initialRouteName='Home' backBehavior='none' activeColor='salmon' >
+    <Tab.Navigator backBehavior='none' activeColor='salmon' >
       <Tab.Screen name='Home' component={DashboardScreen} options={{
         tabBarIcon: ({ color }) => (
           <MaterialCommunityIcons name="home" color={color} size={26} />
@@ -55,13 +57,16 @@ const Dashboard = () => {
   )
 }
 
+
 const GameCategories = () => {
   return (
     <GameCategoriesStack.Navigator initialRouteName='Games'>
       <GameCategoriesStack.Screen name='GameCategories' component={GameScreen} options={{ headerShown: false }} />
-      {/* <GameCategoriesStack.Screen name='Games' />
+      {/*
       <GameCategoriesStack.Screen name='Games' />
-      <GameCategoriesStack.Screen name='Games' /> */}
+      <GameCategoriesStack.Screen name='Games' />
+      <GameCategoriesStack.Screen name='Games' /> 
+      */}
     </GameCategoriesStack.Navigator>
   )
 }
@@ -78,6 +83,7 @@ export default function App() {
         <Stack.Screen name="Success" component={SuccessfulPage} options={{ headerShown: false }} />
         <Stack.Screen name="WelcomeUser" component={WelcomeUser} options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+        <Stack.Screen name="Support" component={SupportScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
